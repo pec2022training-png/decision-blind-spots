@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>決策盲點自我檢測</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .intro {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .options {
+            display: flex;
+            justify-content: space-between;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+        .option-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .option-label input {
+            margin-bottom: 5px;
+            transform: scale(1.2);
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 30px;
+        }
+        .btn-submit:hover {
+            background-color: #34495e;
+        }
+        #result-section {
+            display: none;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fdfbf7;
+            border: 2px solid #d4c4a8;
+            border-radius: 8px;
+        }
+        .result-title {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .score-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .result-details h3 {
+            color: #2980b9;
+            margin-top: 20px;
+        }
+        .footer-credit {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #888;
+        }
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .option-label {
+                flex-direction: row;
+                margin-bottom: 8px;
+            }
+            .option-label input {
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>決策盲點自我檢測</h1>
+    
+    <div class="intro">
+        <strong>測驗說明：</strong><br>
+        請針對以下20個職場常見情境，依據您<strong>最真實的直覺反應</strong>進行評分。<br>
+        （1 = 非常不符合，2 = 不太符合，3 = 普通，4 = 滿符合，5 = 非常符合）
+    </div>
+
+    <form id="quiz-form">
+        <div id="questions-container"></div>
+        <button type="button" class="btn-submit" onclick="calculateResult()">看測驗結果</button>
+    </form>
+
+    <div id="result-section">
+        <h2 class="result-title">您的決策盲點診斷結果</h2>
+        <div id="score-summary"></div>
+        <div id="primary-result" class="result-details"></div>
+    </div>
+
+    <div class="footer-credit">
+        統一企業教育訓練中心製作 Made by Clyde
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "1. 當遇到突發狀況時，我通常會憑直覺立刻下定論，較少花時間評估其他替代方案。",
+        "2. 在跨部門專案中，我認為與其花時間尋求共識，不如由我直接決定方向會更有效率。",
+        "3. 面對可能引起爭議或需要承擔較大風險的決定時，我會傾向讓主管或其他同事來做主。",
+        "4. 我常覺得手邊的數據與資料還不夠齊全，必須再多收集一些才能做出正確判斷。",
+        "5. 為了追求執行速度與盡快結案，我有時會刻意忽略一些看似不重要的細節。",
+        "6. 我對自己的專業經驗非常有自信，即使他人提出不同疑慮，我也很少改變心意。",
+        "7. 當被要求對某項重大專案拍板定案時，我常會感到焦慮，並試圖推遲決策時間。",
+        "8. 我在決策時常陷入長考，因為我想要找出一套絕對不會出錯的「完美方案」。",
+        "9. 我偏好「先做了再說，遇到問題再修正」的敏捷模式，不喜歡事前規劃太久。",
+        "10. 做決策時，我很少主動去思考這個決定會對其他利害關係人造成什麼具體影響。",
+        "11. 開會討論時，我通常會附和多數人的意見，避免自己成為最後承擔責任的人。",
+        "12. 當選項變多時，我會花費大量時間在報表與分析上比較優缺點，甚至導致進度延宕。",
+        "13. 別人常評價我做事明快，但有時會因為思慮不周而需要花額外時間重新收尾。",
+        "14. 我習慣直接下達指令，並不覺得每次決策都需要邀請相關人員一起參與討論。",
+        "15. 遇到困難的兩難抉擇時，我常希望時間能自動解決問題，或者等待別人先開口定調。",
+        "16. 到了原本預定的決策期限，我仍常覺得「還沒準備好」而希望能再延期幾天。",
+        "17. 我很不喜歡「事緩則圓」的想法，覺得那是缺乏決斷力或拖延的藉口。",
+        "18. 我認為多數時候別人的意見只會發散焦點，我自己就能看清並決定最好的路徑。",
+        "19. 如果團隊決策最終失敗，我第一時間的想法通常是：這並非我個人應該扛下的責任。",
+        "20. 我常因為擔心遺漏任何一項微小的變數，而在無數的評估模型中迷失了核心目標。"
+    ];
+
+    const resultData = {
+        A: {
+            title: "倉促決策 (Hasty Decision)",
+            desc: "您追求效率與行動力，但容易在資訊不足時就急於下決定。",
+            action: "在拍板前，需後退一步想想是否有遺漏的資訊，或是再考慮其他方案，練習「事緩則圓」的智慧。"
+        },
+        B: {
+            title: "獨斷獨行 (Dictatorial / Arbitrary)",
+            desc: "您對自身判斷充滿自信，具備強勢領導特質，但容易忽略團隊聲音與跨單位協作。",
+            action: "在下達指令前，先問問自己：「有邀請利益關係人參與嗎？」確保決策能獲得團隊的支持與共識。"
+        },
+        C: {
+            title: "逃避決策 (Evading Decision)",
+            desc: "您注重和諧與安全感，害怕犯錯或引起衝突，導致在關鍵時刻猶豫不決或推諉。",
+            action: "必須克服對失敗的恐懼，隨時提醒自己「應該要負起責任」，這是展現當責精神的重要時刻。"
+        },
+        D: {
+            title: "分析癱瘓 (Analysis Paralysis)",
+            desc: "您極度講求邏輯與數據，追求完美，但常陷入無止盡的評估而錯失最佳時機。",
+            action: "必須體認到這世界上永遠不會有最完整的資訊，以及最完美的方案；該做決定時，就要作決定。"
+        }
+    };
+
+    const container = document.getElementById('questions-container');
+
+    // 動態生成題目
+    questions.forEach((q, index) => {
+        let qNum = index + 1;
+        let html = `
+            <div class="question-block">
+                <div class="question-text">${q}</div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="1"> 1分 (非常不符合)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="2"> 2分</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="3"> 3分 (普通)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="4"> 4分</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="5"> 5分 (非常符合)</label>
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+
+    function calculateResult() {
+        let scores = { A: 0, B: 0, C: 0, D: 0 };
+        let answeredCount = 0;
+
+        for (let i = 1; i <= 20; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected) {
+                answeredCount++;
+                let val = parseInt(selected.value);
+                // 邏輯分配: 1,5,9,13,17為A / 2,6,10,14,18為B / 3,7,11,15,19為C / 4,8,12,16,20為D
+                if (i % 4 === 1) scores.A += val;
+                else if (i % 4 === 2) scores.B += val;
+                else if (i % 4 === 3) scores.C += val;
+                else if (i % 4 === 0) scores.D += val;
+            }
+        }
+
+        if (answeredCount < 20) {
+            alert(`您還有 ${20 - answeredCount} 題尚未填答，請完成所有題目後再看結果。`);
+            return;
+        }
+
+        // 找出最高分
+        let maxScore = Math.max(scores.A, scores.B, scores.C, scores.D);
+        let dominantTypes = [];
+        if (scores.A === maxScore) dominantTypes.push('A');
+        if (scores.B === maxScore) dominantTypes.push('B');
+        if (scores.C === maxScore) dominantTypes.push('C');
+        if (scores.D === maxScore) dominantTypes.push('D');
+
+        // 顯示分數
+        let scoreHtml = `
+            <div class="score-bar"><span>倉促決策 (A型)：</span> <strong>${scores.A} 分</strong></div>
+            <div class="score-bar"><span>獨斷獨行 (B型)：</span> <strong>${scores.B} 分</strong></div>
+            <div class="score-bar"><span>逃避決策 (C型)：</span> <strong>${scores.C} 分</strong></div>
+            <div class="score-bar"><span>分析癱瘓 (D型)：</span> <strong>${scores.D} 分</strong></div>
+        `;
+        document.getElementById('score-summary').innerHTML = scoreHtml;
+
+        // 顯示結果解析
+        let resultHtml = `<h3>您最主要的決策盲點傾向：</h3>`;
+        dominantTypes.forEach(type => {
+            let data = resultData[type];
+            resultHtml += `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 1.2em; color: #d35400;">${data.title}</h4>
+                    <p><strong>狀態描述：</strong>${data.desc}</p>
+                    <p><strong>💡 行動建議：</strong>${data.action}</p>
+                </div>
+            `;
+        });
+
+        if (dominantTypes.length > 1) {
+            resultHtml += `<p style="color:#7f8c8d; font-size: 0.9em;">(註：您有多項最高分同分，代表您在不同情境下可能展現出混合型的盲點傾向。)</p>`;
+        }
+
+        document.getElementById('primary-result').innerHTML = resultHtml;
+        
+        // 顯示結果區塊並滑動到該處
+        let resultSection = document.getElementById('result-section');
+        resultSection.style.display = 'block';
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
