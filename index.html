@@ -19,33 +19,46 @@
             background: #fff;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
         h1 {
             text-align: center;
             color: #2c3e50;
+            margin-bottom: 25px;
         }
         .intro {
             background-color: #e8f4f8;
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 8px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             font-size: 0.95em;
+            color: #2c3e50;
         }
+        
+        /* 題目區塊樣式調整，增加 padding 以配合底色標示 */
         .question-block {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border: 1px solid transparent;
             border-bottom: 1px dashed #eee;
+            border-radius: 8px;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .question-text {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 1.1em;
         }
+        /* 未填答提示樣式 */
+        .unanswered-highlight {
+            background-color: #fdf2f2;
+            border: 1px solid #fadbd8;
+        }
+        
         .options {
             display: flex;
             justify-content: space-between;
-            max-width: 500px;
+            max-width: 550px;
             margin-top: 10px;
         }
         .option-label {
@@ -55,51 +68,163 @@
             cursor: pointer;
             font-size: 0.9em;
             color: #555;
+            transition: color 0.2s;
+        }
+        .option-label:hover {
+            color: #2980b9;
         }
         .option-label input {
-            margin-bottom: 5px;
-            transform: scale(1.2);
+            margin-bottom: 8px;
+            transform: scale(1.3);
+            cursor: pointer;
         }
         .btn-submit {
             display: block;
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background-color: #2980b9;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1.2em;
+            font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 30px;
+            margin-top: 40px;
         }
         .btn-submit:hover {
-            background-color: #34495e;
+            background-color: #2471a3;
         }
+        
+        /* 測驗結果區塊樣式 */
         #result-section {
             display: none;
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #fdfbf7;
-            border: 2px solid #d4c4a8;
-            border-radius: 8px;
+            margin-top: 50px;
+            padding: 30px;
+            background-color: #fcfcfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         .result-title {
             color: #e74c3c;
             text-align: center;
-            font-size: 1.5em;
-            margin-bottom: 20px;
+            font-size: 1.6em;
+            margin-top: 0;
+            margin-bottom: 25px;
         }
-        .score-bar {
+        
+        /* 圖表圖例 */
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            flex-wrap: wrap;
+            color: #555;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-box { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+        /* 長條圖列 */
+        .chart-row {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #f0f0f0;
+        }
+        .chart-label {
             display: flex;
             justify-content: space-between;
-            background: #eee;
-            padding: 10px;
-            border-radius: 5px;
+            align-items: center;
             margin-bottom: 10px;
+            font-size: 1.05em;
+            font-weight: bold;
+            color: #333;
         }
-        .result-details h3 {
+        .score-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .zone-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: normal;
+            color: white;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* 三區顏色設定 */
+        .zone-normal { background-color: #16a085; } /* 綠色：均衡彈性區 */
+        .zone-warning { background-color: #e67e22; } /* 橘色：潛在傾向區 */
+        .zone-danger { background-color: #c0392b; }  /* 紅色：顯著盲點區 */
+        
+        /* 進度條軌道 */
+        .chart-track {
+            height: 22px;
+            background: linear-gradient(to right, 
+                #e8f8f5 0%, #e8f8f5 52.5%, 
+                #fef5e7 52.5%, #fef5e7 62.5%, 
+                #fdeced 62.5%, #fdeced 100%);
+            border-radius: 11px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-bar {
+            height: 100%;
+            border-radius: 11px;
+            transition: width 1s ease-out;
+            min-width: 3%;
+        }
+        .chart-marker {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 2px;
+            background-color: #fff;
+            z-index: 1;
+        }
+
+        /* 第三區解析文字樣式 */
+        .analysis-title {
             color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        .analysis-intro {
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .analysis-block {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 6px solid;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-top: 1px solid #f4f4f4;
+            border-right: 1px solid #f4f4f4;
+            border-bottom: 1px solid #f4f4f4;
+        }
+        .analysis-block h4 { 
+            margin-top: 0; 
+            font-size: 1.25em; 
+            margin-bottom: 12px;
+        }
+        .tie-note {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            background: #f4f7f6;
+            padding: 12px;
+            border-radius: 6px;
             margin-top: 20px;
         }
         .footer-credit {
@@ -108,19 +233,14 @@
             font-size: 0.85em;
             color: #888;
         }
+        
         @media (max-width: 600px) {
-            .options {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .option-label {
-                flex-direction: row;
-                margin-bottom: 8px;
-            }
-            .option-label input {
-                margin-right: 10px;
-                margin-bottom: 0;
-            }
+            .options { flex-direction: column; align-items: flex-start; }
+            .option-label { flex-direction: row; margin-bottom: 10px; }
+            .option-label input { margin-right: 12px; margin-bottom: 0; }
+            .chart-label { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .score-value { width: 100%; justify-content: space-between; }
+            .chart-legend { gap: 10px; }
         }
     </style>
 </head>
@@ -142,7 +262,16 @@
 
     <div id="result-section">
         <h2 class="result-title">您的決策盲點診斷結果</h2>
+        
+        <!-- 長條圖與圖例區 -->
+        <div class="chart-legend">
+            <span class="legend-item"><span class="legend-box" style="background:#16a085;"></span> 均衡彈性區 (15分以下)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#e67e22;"></span> 潛在傾向區 (16-17分)</span>
+            <span class="legend-item"><span class="legend-box" style="background:#c0392b;"></span> 顯著盲點區 (18分以上)</span>
+        </div>
         <div id="score-summary"></div>
+        
+        <!-- 第三區：結果解析區 -->
         <div id="primary-result" class="result-details"></div>
     </div>
 
@@ -177,22 +306,22 @@
 
     const resultData = {
         A: {
-            title: "倉促決策 (Hasty Decision)",
+            title: "倉促決策 (A型)",
             desc: "您追求效率與行動力，但容易在資訊不足時就急於下決定。",
             action: "在拍板前，需後退一步想想是否有遺漏的資訊，或是再考慮其他方案，練習「事緩則圓」的智慧。"
         },
         B: {
-            title: "獨斷獨行 (Dictatorial / Arbitrary)",
+            title: "獨斷獨行 (B型)",
             desc: "您對自身判斷充滿自信，具備強勢領導特質，但容易忽略團隊聲音與跨單位協作。",
             action: "在下達指令前，先問問自己：「有邀請利益關係人參與嗎？」確保決策能獲得團隊的支持與共識。"
         },
         C: {
-            title: "逃避決策 (Evading Decision)",
+            title: "逃避決策 (C型)",
             desc: "您注重和諧與安全感，害怕犯錯或引起衝突，導致在關鍵時刻猶豫不決或推諉。",
             action: "必須克服對失敗的恐懼，隨時提醒自己「應該要負起責任」，這是展現當責精神的重要時刻。"
         },
         D: {
-            title: "分析癱瘓 (Analysis Paralysis)",
+            title: "分析癱瘓 (D型)",
             desc: "您極度講求邏輯與數據，追求完美，但常陷入無止盡的評估而錯失最佳時機。",
             action: "必須體認到這世界上永遠不會有最完整的資訊，以及最完美的方案；該做決定時，就要作決定。"
         }
@@ -200,47 +329,109 @@
 
     const container = document.getElementById('questions-container');
 
-    // 動態生成題目
+    // 清除未填答的視覺標示
+    function clearHighlight(qNum) {
+        let block = document.getElementById(`q-block-${qNum}`);
+        if(block) {
+            block.classList.remove('unanswered-highlight');
+        }
+    }
+
+    // 動態生成題目，加入 id 與 onchange 事件
     questions.forEach((q, index) => {
         let qNum = index + 1;
         let html = `
-            <div class="question-block">
+            <div class="question-block" id="q-block-${qNum}">
                 <div class="question-text">${q}</div>
                 <div class="options">
-                    <label class="option-label"><input type="radio" name="q${qNum}" value="1"> 1分 (非常不符合)</label>
-                    <label class="option-label"><input type="radio" name="q${qNum}" value="2"> 2分</label>
-                    <label class="option-label"><input type="radio" name="q${qNum}" value="3"> 3分 (普通)</label>
-                    <label class="option-label"><input type="radio" name="q${qNum}" value="4"> 4分</label>
-                    <label class="option-label"><input type="radio" name="q${qNum}" value="5"> 5分 (非常符合)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="1" onchange="clearHighlight(${qNum})"> 1分 (非常不符合)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="2" onchange="clearHighlight(${qNum})"> 2分</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="3" onchange="clearHighlight(${qNum})"> 3分 (普通)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="4" onchange="clearHighlight(${qNum})"> 4分</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="5" onchange="clearHighlight(${qNum})"> 5分 (非常符合)</label>
                 </div>
             </div>
         `;
         container.innerHTML += html;
     });
 
+    // 判斷落點區間與顏色的函式
+    function getZoneInfo(score) {
+        if (score >= 18) return { name: "顯著盲點區", class: "zone-danger", color: "#c0392b" };
+        if (score >= 16) return { name: "潛在傾向區", class: "zone-warning", color: "#e67e22" };
+        return { name: "均衡彈性區", class: "zone-normal", color: "#16a085" };
+    }
+
     function calculateResult() {
         let scores = { A: 0, B: 0, C: 0, D: 0 };
         let answeredCount = 0;
+        let firstUnanswered = null;
 
         for (let i = 1; i <= 20; i++) {
             let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            let block = document.getElementById(`q-block-${i}`);
+            
             if (selected) {
                 answeredCount++;
+                block.classList.remove('unanswered-highlight');
                 let val = parseInt(selected.value);
-                // 邏輯分配: 1,5,9,13,17為A / 2,6,10,14,18為B / 3,7,11,15,19為C / 4,8,12,16,20為D
                 if (i % 4 === 1) scores.A += val;
                 else if (i % 4 === 2) scores.B += val;
                 else if (i % 4 === 3) scores.C += val;
                 else if (i % 4 === 0) scores.D += val;
+            } else {
+                block.classList.add('unanswered-highlight');
+                if (!firstUnanswered) {
+                    firstUnanswered = block; // 記錄第一題未填答的區塊
+                }
             }
         }
 
         if (answeredCount < 20) {
-            alert(`您還有 ${20 - answeredCount} 題尚未填答，請完成所有題目後再看結果。`);
+            alert(`您還有 ${20 - answeredCount} 題尚未填答，未填答的題目已標示淡淡的紅色，請補齊後再看結果。`);
+            if (firstUnanswered) {
+                // 自動平滑滾動到第一題未填答的位置，預留一點畫面上方的緩衝空間
+                firstUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
         }
 
-        // 找出最高分
+        const types = [
+            { key: 'A', title: '倉促決策 (A型)' },
+            { key: 'B', title: '獨斷獨行 (B型)' },
+            { key: 'C', title: '逃避決策 (C型)' },
+            { key: 'D', title: '分析癱瘓 (D型)' }
+        ];
+
+        let scoreHtml = '';
+        
+        // 渲染每一題的長條圖
+        types.forEach(t => {
+            let s = scores[t.key];
+            let zone = getZoneInfo(s);
+            let widthPercent = ((s - 5) / 20) * 100;
+            if(widthPercent < 2) widthPercent = 2; 
+
+            scoreHtml += `
+                <div class="chart-row">
+                    <div class="chart-label">
+                        <span>${t.title}</span>
+                        <div class="score-value">
+                            <strong>${s} 分</strong> 
+                            <span class="zone-badge ${zone.class}">${zone.name}</span>
+                        </div>
+                    </div>
+                    <div class="chart-track">
+                        <div class="chart-bar ${zone.class}" style="width: ${widthPercent}%;"></div>
+                        <div class="chart-marker" style="left: 52.5%;"></div>
+                        <div class="chart-marker" style="left: 62.5%;"></div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('score-summary').innerHTML = scoreHtml;
+
+        // 計算最高分並找出對應盲點
         let maxScore = Math.max(scores.A, scores.B, scores.C, scores.D);
         let dominantTypes = [];
         if (scores.A === maxScore) dominantTypes.push('A');
@@ -248,38 +439,40 @@
         if (scores.C === maxScore) dominantTypes.push('C');
         if (scores.D === maxScore) dominantTypes.push('D');
 
-        // 顯示分數
-        let scoreHtml = `
-            <div class="score-bar"><span>倉促決策 (A型)：</span> <strong>${scores.A} 分</strong></div>
-            <div class="score-bar"><span>獨斷獨行 (B型)：</span> <strong>${scores.B} 分</strong></div>
-            <div class="score-bar"><span>逃避決策 (C型)：</span> <strong>${scores.C} 分</strong></div>
-            <div class="score-bar"><span>分析癱瘓 (D型)：</span> <strong>${scores.D} 分</strong></div>
-        `;
-        document.getElementById('score-summary').innerHTML = scoreHtml;
+        let maxZone = getZoneInfo(maxScore);
+        let resultHtml = `<h3 class="analysis-title">您的決策風格分析：</h3>`;
 
-        // 顯示結果解析
-        let resultHtml = `<h3>您最主要的決策盲點傾向：</h3>`;
+        // 動態前導文案
+        if (maxScore <= 15) {
+            resultHtml += `<p class="analysis-intro" style="color: ${maxZone.color};">您的盲點較不明確，但相對高分的傾向為：</p>`;
+        } else {
+            resultHtml += `<p class="analysis-intro" style="color: ${maxZone.color};">您的決策盲點傾向為：</p>`;
+        }
+
+        // 列出最高分的類型解析區塊
         dominantTypes.forEach(type => {
             let data = resultData[type];
             resultHtml += `
-                <div style="margin-bottom: 20px;">
-                    <h4 style="font-size: 1.2em; color: #d35400;">${data.title}</h4>
+                <div class="analysis-block" style="border-left-color: ${maxZone.color};">
+                    <h4 style="color: ${maxZone.color};">${data.title}</h4>
                     <p><strong>狀態描述：</strong>${data.desc}</p>
-                    <p><strong>💡 行動建議：</strong>${data.action}</p>
+                    <p style="margin-bottom: 0; margin-top: 15px;"><strong>💡 行動建議：</strong>${data.action}</p>
                 </div>
             `;
         });
 
         if (dominantTypes.length > 1) {
-            resultHtml += `<p style="color:#7f8c8d; font-size: 0.9em;">(註：您有多項最高分同分，代表您在不同情境下可能展現出混合型的盲點傾向。)</p>`;
+            resultHtml += `<p class="tie-note">(註：檢測顯示您有多項最高分同分，代表您在不同情境下容易展現出「混合型」的決策傾向，請綜合參考以上建議來進行自我調適。)</p>`;
         }
 
         document.getElementById('primary-result').innerHTML = resultHtml;
         
-        // 顯示結果區塊並滑動到該處
         let resultSection = document.getElementById('result-section');
         resultSection.style.display = 'block';
-        resultSection.scrollIntoView({ behavior: 'smooth' });
+        
+        setTimeout(() => {
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     }
 </script>
 
